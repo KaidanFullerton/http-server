@@ -1,0 +1,52 @@
+# executables
+lab2
+test_stat
+thread_detach_example
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.nfs*
+*.vscode/
+
+# Editor files
+*.swp
+*.swo
+~*
+
+# MAC, vim, emacs
+.DS_STORE
+.DS_STORE?
+*~
+*#
+.#*
+.*.sw?
