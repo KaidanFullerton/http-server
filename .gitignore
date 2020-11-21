@@ -1,7 +1,5 @@
 # executables
-lab2
-test_stat
-thread_detach_example
+server
 
 # Object files
 *.o
