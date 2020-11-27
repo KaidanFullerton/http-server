@@ -1,5 +1,5 @@
 # executables
-server
+main
 
 # Object files
 *.o
