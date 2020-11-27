@@ -91,8 +91,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    /* Change directory to test_documents */
-    chdir("test_documents");
+    /* Change directory to server_documents */
+    chdir("server_documents");
     while(1) {
         /* Declare a socket for the client connection. */
         int sock;
