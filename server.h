@@ -2,14 +2,15 @@
 #define FOURKILOBYTE 4096
 
 /*
- *   Primary function to be passed off to a pthread in order to allow concurrent handling of clients
+ *   Primary function to be passed off to a pthread in order to allow concurrent handling of clients.
+ *   Identifies what is in the client's requested path and then responds accordingly
  *
  *   @param socket:   file descriptor for an accepted client
  */
 void *handleClient(void* socket);
 
 /*
- *   Identifies what is requested in the client's requested path and then responds accordingly
+ *   Serves the client a file based on the file extension at the end of path
  *
  *   @param sock:     file descriptor for an accepted client
  *   @param path:     path to the specific resource that the client wants to access

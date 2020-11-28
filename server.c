@@ -23,7 +23,7 @@ void *handleClient(void* socket){
     char path[100];
     char buf[FOURKILOBYTE];
     memset(buf, 0, sizeof(buf));
-    /* Receive from the client */
+    /* Receive HTTP 1.0 GET request from the client */
     int data_recieved = 0; int recv_count = 1;
 
     while(strstr(buf, "\r\n\r\n") == NULL){
@@ -36,6 +36,7 @@ void *handleClient(void* socket){
             data_recieved += recv_count;
         }
     }
+    /* Parse requested path from GET request */
     char* endPath = strchr(buf + 5, ' ');
     memset(path, 0, sizeof(path));
     memcpy(path, buf+5, endPath - (buf+5));
@@ -49,8 +50,8 @@ void *handleClient(void* socket){
         errorResponse(sock);
     }
     else{
-        if(S_ISDIR(statresult.st_mode)){ // is directory
-            // check for index.html file,
+        if(S_ISDIR(statresult.st_mode)){ /* is a directory */
+            /* check for index.html file */
             char indexFinder[200]; 
             memset(indexFinder,0,sizeof(indexFinder));
             if(strcmp(path, "/") == 0){
@@ -59,14 +60,14 @@ void *handleClient(void* socket){
             else{
               sprintf(indexFinder, "%sindex.html", path);
             }
-            if(stat(indexFinder, &statresult)) {
+            if(stat(indexFinder, &statresult)) { /* index.html doesn't exist, serve directory listing */
                 listingResponse(sock, path);
             }
-            else{
+            else{ /* index.html exists, serve it to client */
                 clientResponse(sock,indexFinder);
             }
         }
-        else{ // not a directory, must be a file
+        else{ /* not a directory, must be a file */
             clientResponse(sock,path);
         }
     }
@@ -78,7 +79,8 @@ void clientResponse(int sock, char* path)
 {
     char buf[FOURKILOBYTE];
     memset(buf, 0, sizeof(buf));
-    // find file extension
+
+    /* find file extension */
     char* extension = strrchr(path,'.') + 1;
     char* filetype;
     if      (strcmp(extension,"html") == 0) filetype = "text/html";
@@ -90,8 +92,9 @@ void clientResponse(int sock, char* path)
     else if (strcmp(extension,"pdf")  == 0) filetype = "application/pdf";
     else if (strcmp(extension,"ico")  == 0) filetype = "image/x-icon";
     else filetype = "";
-    sendHeader(sock,"200 OK",filetype);
-    // read in file
+    sendHeader(sock, "200 OK", filetype);
+    
+    /* read in file and send to client */
     FILE *fp = NULL;
     fp = fopen(path, "r");
     int data_to_send = 0;
@@ -116,11 +119,12 @@ void clientResponse(int sock, char* path)
 void errorResponse(int sock){
     char buf[FOURKILOBYTE];
     memset(buf, 0, sizeof(buf));
-    // fill in HTTP header to buffer
-    sendHeader(sock,"404 NOT FOUND","text/html");
+
+    sendHeader(sock, "404 NOT FOUND", "text/html");
+
     FILE *fp;
     fp = fopen("error.html", "r");
-    fread(buf, 1, FOURKILOBYTE,fp);
+    fread(buf, 1, FOURKILOBYTE, fp);
     fclose(fp);
     int data_to_send = strlen(buf);
     int data_sent = 0; int send_count = 0;
@@ -138,12 +142,10 @@ void errorResponse(int sock){
     }
 }
 
-// fill the buffer with the appropriate header
-void sendHeader(int sock, char* responseCode, char* filetype)
-{
+void sendHeader(int sock, char* responseCode, char* filetype){
     char buf[FOURKILOBYTE];
-    memset(buf,0,sizeof(buf));
-    sprintf(buf,"HTTP/1.0 %s\r\nContent-Type: %s\r\n\r\n",responseCode,filetype);
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "HTTP/1.0 %s\r\nContent-Type: %s\r\n\r\n", responseCode, filetype);
     sendHelper(buf,sock);
 }
 
@@ -157,17 +159,20 @@ void listingResponse(int sock, char* path){
         perror("directory");
         exit(1);
     }
+
+    /* send open tags of html page */
     sendHeader(sock,"200 OK","text/html");
     sprintf(placeholder, "<html>Directory listing for: %s <br/><ul>", path);
     sendHelper(placeholder, sock);
 
     while((val = readdir(d)) != NULL ){
-        // helper function to send list item
+        /* send each list item */
         memset(placeholder, 0, sizeof(placeholder));
         sprintf(placeholder, "<li><a href=\"%s/\">%s</a></li>", val->d_name, val->d_name);
         sendHelper(placeholder, sock);
     }
 
+    /* send close tags of html page */
     sendHelper("</ul></html>", sock);
 
     if(closedir(d) != 0){
