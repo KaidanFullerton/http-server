@@ -41,10 +41,9 @@ void errorResponse(int sock);
 void sendHeader(int sock, char* responseCode, char* filetype);
 
 /*
- *   Constructs and sends an HTTP 1.0 message HTTP to an accepted client
+ *   Helper function to send a given ASCII string to the client
  *
+ *   @param string:        ASCII string to be sent
  *   @param sock:          file descriptor for an accepted client
- *   @param responseCode:  response status code to send the client for the request resource
- *   @param filetype:      file type of client's requested resource, used to set HTTP Content-Typer header
  */
 void sendHelper(char* string, int sock);
